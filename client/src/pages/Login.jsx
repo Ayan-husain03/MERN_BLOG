@@ -14,10 +14,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Background from "@/components/Background";
-import { Link } from "react-router";
-import { SignupRoute } from "@/helper/RouteName";
+import { Link, useNavigate } from "react-router";
+import { HomeRoute, SignupRoute } from "@/helper/RouteName";
 
 function Login() {
+  const navigate = useNavigate();
   const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
     password: z.string().min(6, {
@@ -32,8 +33,23 @@ function Login() {
     },
   });
   //   console.log(form);
-  const onSubmit = (values) => {
-    console.log(values);
+  const onSubmit = async (values) => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: true,
+          body: JSON.stringify(values),
+        }
+      );
+      const data = res.json();
+      navigate(HomeRoute);
+      console.log(data);
+    } catch (error) {
+      console.log("Error login : ", error);
+    }
   };
   return (
     <Background>
