@@ -2,20 +2,27 @@ import { User } from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/AsyncHandler.js";
+import jwt from "jsonwebtoken";
+
+// * generate token
+function generateToken(id) {
+  return jwt.sign({ _id: id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+}
+const options = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+  path: "/",
+};
 
 // * Register user controller
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
   if (!username || !email || !password)
-    return res
-      .status(404)
-      .json(new ApiResponse(402, "All fields are required", null));
+    throw new ApiError(400, "All fields are required");
   // check user is existed or not
   const existUser = await User.findOne({ email });
-  if (existUser)
-    return res
-      .status(404)
-      .json(new ApiResponse(402, "User already exist with this email", null));
+  if (existUser) throw new ApiError(409, "User already exist with this email");
   const user = await User.create({
     username,
     email,
@@ -27,4 +34,21 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, "User created successfully", createdUser));
 });
 
-export { registerUser };
+// * Login controller
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) throw new ApiError(400, "All fields are required");
+  const user = await User.findOne({ email });
+  if (!user) throw new ApiError(404, "User doesn't not exist");
+  const matchPass = await user.isPasswordCorrect(password);
+  if (!matchPass) throw new ApiError(404, "Password is incorrect");
+  const logInUser = await User.findById(user?._id).select("-password");
+  const token = generateToken(user?._id);
+
+  return res
+    .status(200)
+    .cookie("token", token, options)
+    .json(new ApiResponse(200, "user logged in", logInUser));
+});
+
+export { registerUser, loginUser };
