@@ -51,4 +51,25 @@ const loginUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "user logged in", logInUser));
 });
 
-export { registerUser, loginUser };
+// ? Google login
+const googleLogin = asyncHandler(async (req, res) => {
+  const { username, email, avatar } = req.body;
+  let user = await User.findOne({ email });
+  if (!user) {
+    // create new user
+    const password = username + "123";
+    user = await User.create({
+      username,
+      email,
+      avatar,
+      password,
+    });
+  }
+  const token = generateToken(user?._id);
+  return res
+    .status(200)
+    .cookie("token", token, options)
+    .json(new ApiResponse(200, "User logged in", user));
+});
+
+export { registerUser, loginUser, googleLogin };
