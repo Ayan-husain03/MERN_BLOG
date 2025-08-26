@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import Background from "@/components/Background";
 import { Link, useNavigate } from "react-router";
 import { HomeRoute, SignupRoute } from "@/helper/RouteName";
+import { AlertPop } from "@/helper/Alert";
 
 function Login() {
   const navigate = useNavigate();
@@ -40,15 +41,18 @@ function Login() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: true,
+          credentials: "include",
           body: JSON.stringify(values),
         }
       );
-      const data = res.json();
+      const data = await res.json();
+      if (!res.ok) return AlertPop("error", data.message || "login error");
       navigate(HomeRoute);
+      AlertPop("success", "Login successfully");
       console.log(data);
     } catch (error) {
       console.log("Error login : ", error);
+      AlertPop("error", `${error?.message || "Error while loading"}`);
     }
   };
   return (

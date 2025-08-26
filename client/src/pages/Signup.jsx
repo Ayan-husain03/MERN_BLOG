@@ -19,6 +19,7 @@ import { LoginRoute } from "@/helper/RouteName";
 import { Loader2 } from "lucide-react";
 import { AlertPop } from "@/helper/Alert";
 import { Eye } from "lucide-react";
+import GoogleLogin from "@/components/GoogleLogin";
 
 function Signup() {
   const navigate = useNavigate();
@@ -75,10 +76,16 @@ function Signup() {
     <>
       <Background>
         <Form {...form}>
-          <div className="mb-10 text-center">
+          <div className="mb-5 text-center">
             <h1 className="font-bold text-2xl md:text-3xl">
               Register Your Account
             </h1>
+            <div>
+              <GoogleLogin />
+              <div className="border my-5 flex justify-center items-center">
+                <span className="absolute bg-slate-900 px-2">or</span>
+              </div>
+            </div>
           </div>
           <div className="my-5">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
