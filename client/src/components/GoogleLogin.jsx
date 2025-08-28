@@ -6,8 +6,11 @@ import { auth, provider } from "@/helper/firebase";
 import { AlertPop } from "@/helper/Alert";
 import { useNavigate } from "react-router";
 import { HomeRoute } from "@/helper/RouteName";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/store/authSlice";
 
 function GoogleLogin() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleLogin = async () => {
     try {
@@ -28,10 +31,12 @@ function GoogleLogin() {
         }
       );
       const result = await response.json();
+      // console.log(result.data);
       if (!response.ok)
-        return AlertPop("error", result?.data?.message || "login error");
+        return AlertPop("error", result?.message || "login error");
+      dispatch(setUser(result?.data));
       navigate(HomeRoute);
-      AlertPop("success", result?.data?.message || "login error");
+      AlertPop("success", result?.message || "login successfully");
     } catch (error) {
       console.log("Error login : ", error);
       AlertPop("error", `${error?.message || "Error while google-logging"}`);

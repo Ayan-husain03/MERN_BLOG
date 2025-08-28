@@ -38,17 +38,17 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) throw new ApiError(400, "All fields are required");
-  const user = await User.findOne({ email });
-  if (!user) throw new ApiError(404, "User doesn't not exist");
-  const matchPass = await user.isPasswordCorrect(password);
+  const existedUser = await User.findOne({ email });
+  if (!existedUser) throw new ApiError(404, "User doesn't not exist");
+  const matchPass = await existedUser.isPasswordCorrect(password);
   if (!matchPass) throw new ApiError(404, "Password is incorrect");
-  const logInUser = await User.findById(user?._id).select("-password");
-  const token = generateToken(user?._id);
+  const user = await User.findById(existedUser?._id).select("-password");
+  const token = generateToken(existedUser?._id);
 
   return res
     .status(200)
     .cookie("token", token, options)
-    .json(new ApiResponse(200, "user logged in", logInUser));
+    .json(new ApiResponse(200, "user logged in", user));
 });
 
 // ? Google login

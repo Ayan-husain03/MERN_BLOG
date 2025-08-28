@@ -17,9 +17,13 @@ import Background from "@/components/Background";
 import { Link, useNavigate } from "react-router";
 import { HomeRoute, SignupRoute } from "@/helper/RouteName";
 import { AlertPop } from "@/helper/Alert";
+import GoogleLogin from "@/components/GoogleLogin";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/store/authSlice";
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
     password: z.string().min(6, {
@@ -47,9 +51,10 @@ function Login() {
       );
       const data = await res.json();
       if (!res.ok) return AlertPop("error", data.message || "login error");
+      dispatch(setUser(data?.data));
       navigate(HomeRoute);
-      AlertPop("success", "Login successfully");
-      console.log(data);
+      AlertPop("success",  data.message || "Login successfully");
+      // console.log(data);
     } catch (error) {
       console.log("Error login : ", error);
       AlertPop("error", `${error?.message || "Error while loading"}`);
@@ -60,6 +65,12 @@ function Login() {
       <Form {...form}>
         <div className="mb-10 text-center">
           <h1 className="font-bold text-2xl md:text-3xl">Login Into Account</h1>
+        </div>
+        <div>
+          <GoogleLogin />
+          <div className="border my-8 flex justify-center items-center">
+            <span className="absolute bg-slate-900 px-2">or</span>
+          </div>
         </div>
         <div className="my-5">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
