@@ -72,4 +72,12 @@ const googleLogin = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "User logged in", user));
 });
 
-export { registerUser, loginUser, googleLogin };
+// * logout controller
+const logout = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .clearCookie("token", options)
+    .json(new ApiResponse(200, "user logged out"));
+});
+
+export { registerUser, loginUser, googleLogin, logout };
