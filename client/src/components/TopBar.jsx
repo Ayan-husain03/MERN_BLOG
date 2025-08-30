@@ -21,6 +21,7 @@ import { Plus } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { AlertPop } from "@/helper/Alert";
 import { removeUser } from "@/store/authSlice";
+import { ProfileRoute } from "@/helper/RouteName";
 
 function TopBar() {
   const user = useSelector((state) => state.user);
@@ -48,9 +49,9 @@ function TopBar() {
   return (
     <nav className="flex justify-between items-center px-10 py-3 fixed w-full shadow-2xl">
       <div>
-        <h1 className="bg-red-500">Blog-App</h1>
+        <h1 className="font-bold text-xl">BlogApp</h1>
       </div>
-      <div className="flex gap-5">
+      <div className="flex  gap-5">
         <SearchBox />
         <div>
           {user.isLoggedIn ? (
@@ -74,7 +75,7 @@ function TopBar() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <Link className="flex gap-2 items-center">
+                    <Link to={ProfileRoute} className="flex gap-2 items-center">
                       <User2 />
                       Profile
                     </Link>
