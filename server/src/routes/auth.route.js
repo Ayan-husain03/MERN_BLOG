@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getUser,
   googleLogin,
   loginUser,
   logout,
@@ -12,5 +13,6 @@ authRouter.route("/register").post(registerUser);
 authRouter.route("/login").post(loginUser);
 authRouter.route("/google-login").post(googleLogin);
 authRouter.route("/logout").get(logout);
+authRouter.route("/get-user/:_id").get(getUser);
 
 export default authRouter;

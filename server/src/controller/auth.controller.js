@@ -80,4 +80,13 @@ const logout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "user logged out"));
 });
 
-export { registerUser, loginUser, googleLogin, logout };
+// * get user
+
+const getUser = asyncHandler(async (req, res) => {
+  const { _id } = req.params;
+  const user = await User.findById(_id);
+  if (!user) throw new ApiError(404, "User not found");
+  res.status(200).json(new ApiResponse(200, "user data found", user));
+});
+
+export { registerUser, loginUser, googleLogin, logout, getUser };
