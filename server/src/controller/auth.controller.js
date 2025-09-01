@@ -89,4 +89,7 @@ const getUser = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, "user data found", user));
 });
 
-export { registerUser, loginUser, googleLogin, logout, getUser };
+// //update user
+const updateUser = asyncHandler(async (req, res) => {});
+
+export { registerUser, loginUser, googleLogin, logout, getUser, updateUser };
