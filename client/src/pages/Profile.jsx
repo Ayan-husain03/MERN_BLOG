@@ -1,3 +1,4 @@
+import Loading from "@/components/Loading";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,22 +12,39 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertPop } from "@/helper/Alert";
+import useFetch from "@/hooks/useFetch";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PenBox } from "lucide-react";
+import { Camera } from "lucide-react";
 
 import React from "react";
+import { useEffect } from "react";
+import { useState } from "react";
+import Dropzone from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { z } from "zod";
 
 function Profile() {
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const [file, setFile] = useState([]);
   const user = useSelector((state) => state.user);
+  const { data, loading, error } = useFetch(
+    `${import.meta.env.VITE_API_BASE_URL}/auth/get-user/${user?.user?._id}`,
+    {
+      method: "get",
+      credentials: "include",
+    }
+  );
   const formSchema = z.object({
     name: z.string().min(4, { message: "name must be 4 character long" }),
     email: z.string().email({ message: "Invalid email address" }),
     bio: z.string().min(4, { message: "bio must be 4 character long" }),
     password: z.string(),
   });
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,18 +54,79 @@ function Profile() {
       password: "",
     },
   });
-  const onSubmit = () => {};
+  // ? here we are adding values in form field which we are fetching from useFetch()
+  useEffect(() => {
+    if (data && data.data) {
+      form.reset({
+        name: data?.data?.username,
+        email: data?.data?.email,
+        bio: data?.data?.bio ?? "",
+      });
+    }
+  }, [data]);
+  // ? form submit handler
+  const onSubmit = async (values) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("data", JSON.stringify(values));
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/update-user/${
+          user?.user?._id
+        }`,
+        {
+          method: "PUT",
+          credentials: "include",
+          body: formData,
+        }
+      );
+      const result = await response.json();
+      if (response.success)
+        AlertPop("success", result?.message || "User update successfully");
+    } catch (error) {
+      console.log("Error : ", error);
+      AlertPop("error", error);
+    }
+  };
+
+  // ? file dropzone handler
+  const handleFiles = (files) => {
+    const file = files[0];
+    const preview = URL.createObjectURL(file);
+    setAvatarPreview(preview);
+    setFile(file);
+  };
+  if (loading) return <Loading />;
   return (
     <Card className="">
       <CardContent>
         <div className="flex justify-center items-center">
-          <Avatar className="w-42 h-42">
-            <AvatarImage src={user?.user?.avatar} />
-          </Avatar>
+          <Dropzone onDrop={(acceptedFiles) => handleFiles(acceptedFiles)}>
+            {({ getRootProps, getInputProps }) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <Avatar className="w-42 h-42 relative group  transition-all duration-300">
+                  <AvatarImage
+                    src={
+                      avatarPreview
+                        ? avatarPreview
+                        : data?.data?.avatar || "/images/user.png"
+                    }
+                  />
+                  <div className="bg-black/50 z-10 absolute w-full h-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center opacity-0 items-center group-hover:opacity-100  transition-all duration-300 cursor-pointer">
+                    <Camera size={40} className="text-white" />
+                  </div>
+                </Avatar>
+              </div>
+            )}
+          </Dropzone>
         </div>
         <Form {...form}>
-          <div className="mb-10 text-center">
-            <h1 className="font-bold text-2xl md:text-3xl">Update profile</h1>
+          <div className="mb-10 text-center flex items-center justify-center gap-2">
+            <h1 className="font-extrabold text-2xl md:text-3xl">
+              Update profile
+            </h1>
+            <PenBox />
           </div>
           <div className="my-5">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -129,12 +208,6 @@ function Profile() {
               </Button>
             </form>
           </div>
-          {/* <div className="flex items-center justify-center gap-2 mt-5">
-            <p>Don't have an account</p>
-            <span className="text-blue-600 hover:underline">
-              <Link to="/">Signup</Link>
-            </span>
-          </div> */}
         </Form>
       </CardContent>
     </Card>

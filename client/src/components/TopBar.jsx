@@ -15,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User2 } from "lucide-react";
-import { LucideLogOut } from "lucide-react";
 import { LogOutIcon } from "lucide-react";
 import { Plus } from "lucide-react";
 import { useDispatch } from "react-redux";
