@@ -1,3 +1,4 @@
+import { AlertPop } from "@/helper/Alert";
 import { useState, useEffect } from "react";
 
 const useFetch = (url, option = {}, dependencies = []) => {
@@ -11,6 +12,9 @@ const useFetch = (url, option = {}, dependencies = []) => {
         setLoading(true);
         const res = await fetch(url, option);
         const result = await res.json();
+        if (!res.ok) {
+          return AlertPop("error", result.message || "error fetching data");
+        }
         setData(result);
         setError("");
       } catch (error) {

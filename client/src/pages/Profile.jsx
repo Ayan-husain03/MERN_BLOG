@@ -14,7 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertPop } from "@/helper/Alert";
 import useFetch from "@/hooks/useFetch";
+import { setUser } from "@/store/authSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { PenBox } from "lucide-react";
 import { Camera } from "lucide-react";
 
@@ -23,14 +25,17 @@ import { useEffect } from "react";
 import { useState } from "react";
 import Dropzone from "react-dropzone";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { z } from "zod";
 
 function Profile() {
   const [avatarPreview, setAvatarPreview] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
   const [file, setFile] = useState([]);
   const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const { data, loading, error } = useFetch(
     `${import.meta.env.VITE_API_BASE_URL}/auth/get-user/${user?.user?._id}`,
     {
@@ -38,12 +43,16 @@ function Profile() {
       credentials: "include",
     }
   );
+  // console.log(data);
+  if (error) {
+    AlertPop("error", error.message || "failed fetching user profile");
+    return;
+  }
 
   const formSchema = z.object({
     username: z.string().min(4, { message: "name must be 4 character long" }),
     email: z.string().email({ message: "Invalid email address" }),
     bio: z.string().min(4, { message: "bio must be 4 character long" }),
-    password: z.string(),
   });
 
   const form = useForm({
@@ -71,6 +80,7 @@ function Profile() {
     formData.append("file", file);
     formData.append("data", JSON.stringify(values));
     try {
+      setIsUpdating(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/auth/update-user/${
           user?.user?._id
@@ -82,13 +92,16 @@ function Profile() {
         }
       );
       const result = await response.json();
-      console.log(result);
+      // console.log(result);
       if (!response.ok)
         return AlertPop("error", result.message || "failed to update user");
+      dispatch(setUser(result?.data));
       AlertPop("success", result?.message || "User update successfully");
     } catch (error) {
       console.log("Error : ", error);
       AlertPop("error", error);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -206,8 +219,19 @@ function Profile() {
                   </FormItem>
                 )}
               />
-              <Button className="w-full" type="submit">
-                Save changes
+              <Button
+                className="w-full flex items-center justify-center gap-2"
+                type="submit"
+                disabled={isUpdating}
+              >
+                {isUpdating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  "Save changes"
+                )}
               </Button>
             </form>
           </div>
