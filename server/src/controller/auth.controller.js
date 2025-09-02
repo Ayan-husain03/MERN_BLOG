@@ -3,6 +3,7 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/AsyncHandler.js";
 import jwt from "jsonwebtoken";
+import uploadCloudinary from "../utils/uploadCloudinary.js";
 
 // * generate token
 function generateToken(id) {
@@ -90,6 +91,27 @@ const getUser = asyncHandler(async (req, res) => {
 });
 
 // //update user
-const updateUser = asyncHandler(async (req, res) => {});
+const updateUser = asyncHandler(async (req, res) => {
+  const { _id } = req.params;
+  const parsedData = JSON.parse(req.body.data);
+  const { username, email, bio, password } = parsedData;
+  const user = await User.findById(_id);
+  user.username = username;
+  user.email = email;
+  user.bio = bio;
+  if (password) {
+    user.password = password;
+  }
+  if (req.file) {
+    const userAvatar = await uploadCloudinary(req?.file?.path);
+    const avatarUrl = userAvatar.secure_url;
+    user.avatar = avatarUrl;
+  }
+  await user.save();
+  const updatedUser = await User.findById(_id).select("-password");
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "User update successfully", updatedUser));
+});
 
 export { registerUser, loginUser, googleLogin, logout, getUser, updateUser };

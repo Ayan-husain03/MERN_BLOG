@@ -38,8 +38,9 @@ function Profile() {
       credentials: "include",
     }
   );
+
   const formSchema = z.object({
-    name: z.string().min(4, { message: "name must be 4 character long" }),
+    username: z.string().min(4, { message: "name must be 4 character long" }),
     email: z.string().email({ message: "Invalid email address" }),
     bio: z.string().min(4, { message: "bio must be 4 character long" }),
     password: z.string(),
@@ -48,7 +49,7 @@ function Profile() {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      username: "",
       email: "",
       bio: "",
       password: "",
@@ -58,7 +59,7 @@ function Profile() {
   useEffect(() => {
     if (data && data.data) {
       form.reset({
-        name: data?.data?.username,
+        username: data?.data?.username,
         email: data?.data?.email,
         bio: data?.data?.bio ?? "",
       });
@@ -75,14 +76,16 @@ function Profile() {
           user?.user?._id
         }`,
         {
-          method: "PUT",
+          method: "put",
           credentials: "include",
           body: formData,
         }
       );
       const result = await response.json();
-      if (response.success)
-        AlertPop("success", result?.message || "User update successfully");
+      console.log(result);
+      if (!response.ok)
+        return AlertPop("error", result.message || "failed to update user");
+      AlertPop("success", result?.message || "User update successfully");
     } catch (error) {
       console.log("Error : ", error);
       AlertPop("error", error);
@@ -133,7 +136,7 @@ function Profile() {
               {/* // ? name field */}
               <FormField
                 control={form.control}
-                name="name"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Name</FormLabel>
