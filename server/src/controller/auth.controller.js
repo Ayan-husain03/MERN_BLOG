@@ -4,6 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/AsyncHandler.js";
 import jwt from "jsonwebtoken";
 import uploadCloudinary from "../utils/uploadCloudinary.js";
+import bcrypt from "bcryptjs";
 
 // * generate token
 function generateToken(id) {
@@ -114,4 +115,37 @@ const updateUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "User update successfully", updatedUser));
 });
 
-export { registerUser, loginUser, googleLogin, logout, getUser, updateUser };
+// * update passwrod controller
+const updatePassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const { _id } = req.params;
+  const user = await User.findById(_id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  if (!oldPassword || !newPassword) {
+    throw new ApiError(400, "All fields are required");
+  }
+  const isPassCorrect = await user.isPasswordCorrect(oldPassword);
+  if (!isPassCorrect) {
+    throw new ApiError(400, "Old Password is not correct");
+  }
+  if (oldPassword === newPassword) {
+    throw new ApiError(400, "New password cannot be same as old password");
+  }
+  user.password = newPassword;
+  await user.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "password update successfully"));
+});
+
+export {
+  registerUser,
+  loginUser,
+  googleLogin,
+  logout,
+  getUser,
+  updateUser,
+  updatePassword,
+};
