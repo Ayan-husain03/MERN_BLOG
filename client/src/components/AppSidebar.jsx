@@ -12,13 +12,18 @@ import {
 import { Link } from "react-router";
 import { Home } from "lucide-react";
 import { User } from "lucide-react";
-import { ChartBarIcon } from "lucide-react";
 import { MessageCircle } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 const items = [
   {
     path: "/",
     text: "Home",
     icon: Home,
+  },
+  {
+    path: "/category",
+    text: "Category",
+    icon: LayoutGrid,
   },
   {
     path: "/comments",
@@ -45,7 +50,9 @@ function AppSidebar() {
               <SidebarMenuItem key={item.text}>
                 <SidebarMenuButton>
                   <item.icon />
-                  <Link className="font-bold" to={item.path}>{item.text}</Link>
+                  <Link className="font-bold" to={item.path}>
+                    {item.text}
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}

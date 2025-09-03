@@ -2,6 +2,7 @@ import Loading from "@/components/Loading";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
 import {
   Form,
   FormControl,
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import Updatepassword from "@/components/Updatepassword";
 import { AlertPop } from "@/helper/Alert";
 import useFetch from "@/hooks/useFetch";
 import { setUser } from "@/store/authSlice";
@@ -61,7 +63,6 @@ function Profile() {
       username: "",
       email: "",
       bio: "",
-      password: "",
     },
   });
   // ? here we are adding values in form field which we are fetching from useFetch()
@@ -115,6 +116,7 @@ function Profile() {
   if (loading) return <Loading />;
   return (
     <Card className="">
+      <Updatepassword />
       <CardContent>
         <div className="flex justify-center items-center">
           <Dropzone onDrop={(acceptedFiles) => handleFiles(acceptedFiles)}>
@@ -201,7 +203,7 @@ function Profile() {
                 )}
               />
               {/* //? password field */}
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
@@ -218,7 +220,8 @@ function Profile() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
+
               <Button
                 className="w-full flex items-center justify-center gap-2"
                 type="submit"
