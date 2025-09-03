@@ -115,7 +115,7 @@ function Profile() {
   };
   if (loading) return <Loading />;
   return (
-    <Card className="">
+    <Card className="relative">
       <Updatepassword />
       <CardContent>
         <div className="flex justify-center items-center">

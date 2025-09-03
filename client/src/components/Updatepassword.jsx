@@ -22,8 +22,15 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { useSelector } from "react-redux";
+import { AlertPop } from "@/helper/Alert";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 function Updatepassword() {
+  const user = useSelector((state) => state.user);
+  const [isUpdating, setIsUpdating] = useState(false);
+  // * form schema
   const formSchema = z.object({
     oldPassword: z
       .string()
@@ -40,13 +47,37 @@ function Updatepassword() {
     },
   });
   const onsubmit = async (values) => {
-    console.log(values);
+    try {
+      setIsUpdating(true);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/update-password/${
+          user?.user?._id
+        }`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(values),
+        }
+      );
+      const result = await response.json();
+      if (!response.ok) {
+        return AlertPop("error", "Response is not ok");
+      }
+      AlertPop("success", result.message || "password has been updated");
+      form.reset();
+    } catch (error) {
+      console.error("Error updating pass : ", error);
+      AlertPop("error", error.message || "Something went wrong");
+    } finally {
+      setIsUpdating(false);
+    }
   };
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className={"absolute text-blue-600 right-10 cursor-pointer"}
+          className={"absolute text-blue-600 right-0 top-0 cursor-pointer"}
           variant={"ghost"}
         >
           change password <PenBox />
@@ -66,6 +97,7 @@ function Updatepassword() {
                   <FormLabel>OldPassword</FormLabel>
                   <FormControl>
                     <Input
+                      type="password"
                       className="p-5"
                       placeholder="Enter your old password"
                       {...field}
@@ -83,6 +115,7 @@ function Updatepassword() {
                   <FormLabel>New Password</FormLabel>
                   <FormControl>
                     <Input
+                      type="password"
                       className="p-5"
                       placeholder="Enter your new Password"
                       {...field}
@@ -97,8 +130,20 @@ function Updatepassword() {
               <DialogClose asChild>
                 <Button variant={"outline"}>Cancel</Button>
               </DialogClose>
-              <Button type="submit" variant={"outline"}>
-                Save
+              <Button
+                disabled={isUpdating}
+                className="flex items-center gap-2"
+                type="submit"
+                variant={"outline"}
+              >
+                {isUpdating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  "Save"
+                )}
               </Button>
             </DialogFooter>
           </form>
