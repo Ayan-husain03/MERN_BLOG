@@ -14,14 +14,15 @@ import { Home } from "lucide-react";
 import { User } from "lucide-react";
 import { MessageCircle } from "lucide-react";
 import { LayoutGrid } from "lucide-react";
+import { CategoryDetailsRoute, HomeRoute } from "@/helper/RouteName";
 const items = [
   {
-    path: "/",
+    path: HomeRoute,
     text: "Home",
     icon: Home,
   },
   {
-    path: "/category",
+    path: CategoryDetailsRoute,
     text: "Category",
     icon: LayoutGrid,
   },
