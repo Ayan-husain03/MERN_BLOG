@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -61,7 +61,7 @@ function AddCategory() {
   const onSubmit = async (values) => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
+        `${import.meta.env.VITE_API_BASE_URL}/category/add`,
         {
           method: "POST",
           headers: {
@@ -72,26 +72,24 @@ function AddCategory() {
       );
       const data = await res.json();
       if (!res.ok) {
-        AlertPop("error", "Cannot create user something wrong");
+        AlertPop("error", "Cannot create category something wrong");
       }
+
       console.log(data);
-      navigate(LoginRoute);
-      AlertPop("success", "User created successfully");
+      form.reset();
+      AlertPop("success", data.message || "Category created successfully");
     } catch (error) {
-      console.log("Error creating user something wrong :", error);
+      console.log("Error creating Category something wrong :", error);
       AlertPop("error", "Something went wrong");
     }
   };
   return (
     <Card className="max-w-screen-md mx-auto">
-      <CardHeader></CardHeader>
+      <CardHeader>
+        <CardTitle>Add Your Category</CardTitle>
+      </CardHeader>
       <CardContent>
         <Form {...form}>
-          <div className="mb-5 text-center">
-            <h1 className="font-bold text-2xl md:text-3xl">
-              Add Your Category
-            </h1>
-          </div>
           <div className="my-5">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
