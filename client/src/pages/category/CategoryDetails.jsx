@@ -20,7 +20,9 @@ function CategoryDetails() {
             </Link>
           </Button>
         </CardHeader>
-        <CardContent></CardContent>
+              <CardContent>
+                  
+        </CardContent>
       </Card>
     </div>
   );
