@@ -15,4 +15,11 @@ const addCategory = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, "new category added"));
 });
 
-export { addCategory };
+const getAllCategory = asyncHandler(async (req, res) => {
+  const AllCategories = await Category.find().sort({ createdAt: -1 });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "fetched successfully", AllCategories));
+});
+
+export { addCategory, getAllCategory };
