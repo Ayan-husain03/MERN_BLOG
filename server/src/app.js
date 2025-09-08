@@ -17,7 +17,9 @@ app.use(errorHandler);
 
 // import router here
 import authRouter from "./routes/auth.route.js";
+import categoryRoute from "./routes/category.route.js";
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/category", categoryRoute);
 
 app.use(errorHandler);
 
