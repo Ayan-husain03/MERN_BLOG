@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addCategory,
+  deleteCategory,
   editCategory,
   getAllCategory,
   getCategory,
@@ -11,5 +12,6 @@ categoryRoute.route("/add").post(addCategory);
 categoryRoute.route("/all").get(getAllCategory);
 categoryRoute.route("/get/:_id").get(getCategory);
 categoryRoute.route("/update/:_id").put(editCategory);
+categoryRoute.route("/delete/:_id").delete(deleteCategory);
 
 export default categoryRoute;
