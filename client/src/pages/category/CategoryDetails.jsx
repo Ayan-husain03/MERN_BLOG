@@ -28,7 +28,6 @@ function CategoryDetails() {
       credentials: "include",
     }
   );
-  console.log(data);
   return (
     <div>
       {loading && <Loading />}

@@ -75,7 +75,6 @@ function AddCategory() {
         AlertPop("error", "Cannot create category something wrong");
       }
 
-      console.log(data);
       form.reset();
       AlertPop("success", data.message || "Category created successfully");
     } catch (error) {

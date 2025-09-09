@@ -33,6 +33,21 @@ const getCategory = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Category fetch successfully", category));
 });
 
-const editCategory = asyncHandler(async (req, res) => {});
+const editCategory = asyncHandler(async (req, res) => {
+  const { name, slug } = req.body;
+  const { _id } = req.params;
+  const category = await Category.findByIdAndUpdate(
+    _id,
+    {
+      name,
+      slug,
+    },
+    { new: true }
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Category updated", category));
+});
 
 export { addCategory, getAllCategory, editCategory, getCategory };

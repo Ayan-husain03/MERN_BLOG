@@ -16,15 +16,30 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Background from "@/components/Background";
-import { Link, useNavigate } from "react-router";
-import { LoginRoute } from "@/helper/RouteName";
+import { Link, useNavigate, useParams } from "react-router";
+import {
+  AddCategoryRoute,
+  CategoryDetailsRoute,
+  LoginRoute,
+} from "@/helper/RouteName";
 import { Loader2 } from "lucide-react";
 import { AlertPop } from "@/helper/Alert";
 import { Eye } from "lucide-react";
 import { useEffect } from "react";
+import useFetch from "@/hooks/useFetch";
+import Loading from "@/components/Loading";
 
 function EditCategory() {
   const navigate = useNavigate();
+  const { cat_id } = useParams();
+  const { data, loading, error } = useFetch(
+    `${import.meta.env.VITE_API_BASE_URL}/category/get/${cat_id}`,
+    {
+      method: "get",
+      credentials: "include",
+    },
+    [cat_id]
+  );
   const formSchema = z.object({
     name: z
       .string()
@@ -58,12 +73,20 @@ function EditCategory() {
       form.setValue("slug", slug);
     }
   }, [form.watch("name")]);
+  useEffect(() => {
+    if (data && data.data) {
+      form.reset({
+        name: data?.data?.name,
+        slug: data?.data?.slug,
+      });
+    }
+  }, [data]);
   const onSubmit = async (values) => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/category/add`,
+        `${import.meta.env.VITE_API_BASE_URL}/category/update/${cat_id}`,
         {
-          method: "POST",
+          method: "put",
           headers: {
             "Content-Type": "application/json",
           },
@@ -72,17 +95,18 @@ function EditCategory() {
       );
       const data = await res.json();
       if (!res.ok) {
-        AlertPop("error", "Cannot create category something wrong");
+        AlertPop("error", "Cannot update category something wrong");
       }
-
-      console.log(data);
-      form.reset();
-      AlertPop("success", data.message || "Category created successfully");
+      navigate(CategoryDetailsRoute);
+      AlertPop("success", data.message || "Category updated successfully");
     } catch (error) {
-      console.log("Error creating Category something wrong :", error);
+      console.log("Error updating Category something wrong :", error);
       AlertPop("error", "Something went wrong");
     }
   };
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <Card className="max-w-screen-md mx-auto">
       <CardHeader>
