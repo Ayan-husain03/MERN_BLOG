@@ -22,4 +22,17 @@ const getAllCategory = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "fetched successfully", AllCategories));
 });
 
-export { addCategory, getAllCategory };
+const getCategory = asyncHandler(async (req, res) => {
+  const { _id } = req.params;
+  const category = await Category.findById(_id);
+  if (!category) {
+    throw new ApiError(404, "Category not found");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Category fetch successfully", category));
+});
+
+const editCategory = asyncHandler(async (req, res) => {});
+
+export { addCategory, getAllCategory, editCategory, getCategory };
