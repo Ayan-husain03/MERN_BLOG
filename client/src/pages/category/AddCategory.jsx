@@ -1,4 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -17,11 +23,13 @@ import {
 import { Input } from "@/components/ui/input";
 import Background from "@/components/Background";
 import { Link, useNavigate } from "react-router";
-import { LoginRoute } from "@/helper/RouteName";
+import { CategoryDetailsRoute, LoginRoute } from "@/helper/RouteName";
 import { Loader2 } from "lucide-react";
 import { AlertPop } from "@/helper/Alert";
 import { Eye } from "lucide-react";
 import { useEffect } from "react";
+import { FcLeft } from "react-icons/fc";
+import { ArrowLeft } from "lucide-react";
 
 function AddCategory() {
   const navigate = useNavigate();
@@ -86,6 +94,12 @@ function AddCategory() {
     <Card className="max-w-screen-md mx-auto">
       <CardHeader>
         <CardTitle>Add Your Category</CardTitle>
+        <CardAction>
+          <Link className="flex gap-1" to={CategoryDetailsRoute}>
+            <ArrowLeft />
+            back
+          </Link>
+        </CardAction>
       </CardHeader>
       <CardContent>
         <Form {...form}>

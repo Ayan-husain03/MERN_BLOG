@@ -10,24 +10,36 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import handleDelete from "@/helper/handleDelete";
 import { AddCategoryRoute, EditCategoryRoute } from "@/helper/RouteName";
 import useFetch from "@/hooks/useFetch";
 import { Edit } from "lucide-react";
-import { Delete } from "lucide-react";
 import { Trash2 } from "lucide-react";
-import { DeleteIcon } from "lucide-react";
 import { Plus } from "lucide-react";
 import React from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 
 function CategoryDetails() {
+  const [isDel, setIsDel] = useState(false);
+  // * fetching all category from useFetch hook
   const { data, loading, error } = useFetch(
     `${import.meta.env.VITE_API_BASE_URL}/category/all`,
     {
       method: "get",
       credentials: "include",
-    }
+    },
+    [isDel]
   );
+  // ? delete function to delete category
+  async function deleteCategory(id) {
+    const del = await handleDelete(
+      `${import.meta.env.VITE_API_BASE_URL}/category/delete/${id}`
+    );
+    if (del) {
+      setIsDel(!isDel);
+    }
+  }
   return (
     <div>
       {loading && <Loading />}
@@ -66,7 +78,10 @@ function CategoryDetails() {
                             <Edit />
                           </Link>
                         </Button>
-                        <Button variant={"destructive"}>
+                        <Button
+                          variant={"destructive"}
+                          onClick={() => deleteCategory(item._id)}
+                        >
                           <Trash2 />
                         </Button>
                       </TableCell>
